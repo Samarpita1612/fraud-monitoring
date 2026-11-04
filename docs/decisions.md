@@ -1,0 +1,3 @@
+- Weekly fraud rate fluctuates naturally (peak near week 15), so alerts must tolerate noise
+- Fraud rate differs by period (train 3.1%, val 4.0%, prod 3.6%), so natural drift is expected
+- Last ~9 days (day 174+) left unused so all 12 batches are full weeks
