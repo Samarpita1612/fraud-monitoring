@@ -1,3 +1,15 @@
 - Weekly fraud rate fluctuates naturally (peak near week 15), so alerts must tolerate noise
 - Fraud rate differs by period (train 3.1%, val 4.0%, prod 3.6%), so natural drift is expected
 - Last ~9 days (day 174+) left unused so all 12 batches are full weeks
+- Skipped V columns in version 1 (anonymous, hard to explain)
+- Split: train days 0-60, val 60-90, prod 90-174 (12 weekly batches)
+- Data sorted by TransactionDT
+- Features use only current and past rows; verified with a "cut off the future" test
+- uid = card1 + card2 + addr1 is a pseudo-customer, an approximation, not a real ID
+- TransactionID, TransactionDT, day, week are NOT model inputs (meta columns only)
+- Categories are defined from train rows only
+- No label-based features (like past fraud history) because labels arrive late in real life
+- email_match kept as is: the 7.0% fraud group is specifically "emails match"; missing and mismatch are both near base rate
+- n_prior_txn means activity of a pseudo-ID group, not a true customer history (only 12.5% of rows have no prior)
+- Leak test: features computed on the first 200,000 rows matched the same rows computed on all data
+- Categories unseen in the train period become blank (NaN) in later periods
