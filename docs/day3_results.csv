@@ -1,0 +1,4 @@
+,pr_auc,roc_auc,recall@80%prec
+random guess,0.0408,0.5051,0.0
+logistic regression,0.214,0.7977,0.0208
+lightgbm,0.616,0.9175,0.4216
