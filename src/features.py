@@ -75,3 +75,5 @@ def to_categorical(df, train_mask):
         cats = df.loc[train_mask, c].dropna().unique()
         df[c] = pd.Categorical(df[c], categories=cats)
     return df
+
+RAW_FEATURES = NUM_RAW + CAT_COLS      # the 52 columns the champion uses

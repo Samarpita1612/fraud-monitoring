@@ -1,0 +1,30 @@
+[
+  {
+    "version": "v1",
+    "created": "2026-11-06",
+    "trained_on_days": [
+      0,
+      60
+    ],
+    "n_features": 52,
+    "n_estimators": 247,
+    "review_cost": 5.0,
+    "threshold": 0.0173,
+    "val_metrics": {
+      "pr_auc": 0.6295,
+      "roc_auc": 0.9181,
+      "recall@80%prec": 0.467
+    },
+    "val_summary": {
+      "threshold": 0.0173,
+      "alerts": 17626,
+      "alert_rate": 0.1921,
+      "precision": 0.1777,
+      "recall": 0.8468,
+      "fraud_usd_caught": 435174.33,
+      "fraud_usd_total": 515459.25,
+      "net_benefit": 347044.33
+    },
+    "status": "champion"
+  }
+]
