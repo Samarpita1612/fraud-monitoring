@@ -1,0 +1,6 @@
+{
+  "score_psi": 0.25,
+  "psi_cut": 0.25,
+  "n_groups": 2,
+  "pr_auc_drop": 0.2
+}

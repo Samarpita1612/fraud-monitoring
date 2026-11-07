@@ -1,0 +1,7 @@
+policy,week,reasons,champion,challenger,pooled_pr_auc,champ_holdout_pr_auc,chall_holdout_pr_auc,chall_threshold,promoted
+every 4 weeks,3,schedule,v1,c3,0.4702,0.4702,0.5396,0.023203342038299334,True
+every 4 weeks,7,schedule,c3,c7,0.5474,0.5474,0.6351,0.027991184023174243,True
+on alert,0,feature drift,v1,c0,,0.6229,0.6755,0.023387425124518052,True
+on alert,2,feature drift,c0,c2,,0.5131,0.5452,0.01735152494598536,True
+on alert,4,feature drift,c2,c4,,0.5418,0.5827,0.01530213467127685,True
+on alert,7,feature drift,c4,c7,,0.566,0.6351,0.027991184023174243,True
