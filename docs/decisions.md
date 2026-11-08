@@ -4,6 +4,7 @@
 - Skipped V columns in version 1 (anonymous, hard to explain)
 - Split: train days 0-60, val 60-90, prod 90-174 (12 weekly batches)
 - Data sorted by TransactionDT
+## Features
 - Features use only current and past rows; verified with a "cut off the future" test
 - uid = card1 + card2 + addr1 is a pseudo-customer, an approximation, not a real ID
 - TransactionID, TransactionDT, day, week are NOT model inputs (meta columns only)
@@ -13,3 +14,47 @@
 - n_prior_txn means activity of a pseudo-ID group, not a true customer history (only 12.5% of rows have no prior)
 - Leak test: features computed on the first 200,000 rows matched the same rows computed on all data
 - Categories unseen in the train period become blank (NaN) in later periods
+## Modelling
+- Baselines compared on the validation period (days 60-90): random, logistic regression, LightGBM
+- Primary metric: PR-AUC; also report recall at 80% precision and ROC-AUC for reference
+- LightGBM early-stopped on validation, so validation scores are slightly optimistic; production weeks (days 90-174) not touched yet
+- Feature set for champion: raw columns only (52). On validation, raw-only scored PR-AUC 0.6295 vs 0.6160 with engineered features (single seed), so engineered features were not used
+- Champion v1: LightGBM, 52 raw features, trained on days 0-60, fixed at 247 trees (from early stopping in Day 3)
+- Threshold chosen on validation to maximise net benefit = fraud $ caught - review cost x alerts
+- Review cost of $5 per alert is an assumption (sensitivity checked for $1-$50); amounts treated as dollars (no currency given)
+- Assumes catching a fraud saves its full amount, which is a simplification
+- Reference snapshot: feature distributions from train rows (10 quantile buckets + blanks), score distribution from validation rows
+- Day 5 result: v1 performance-drop rule fired in 7 of 10 evaluable weeks; weekly PR-AUC varies by 0.05-0.1 and validation PR-AUC is optimistic, so a single-week 15% rule is too jumpy
+- v1 rules were frozen before the production replay and are kept unchanged in this log; any later rule change is made after seeing production, and is documented as such
+- Quiet-period check: validation-week PR-AUC fell 0.730 -> 0.656 -> 0.607 -> 0.544, within 0.009 of the frozen 0.535 alert line, so the 15% rule was borderline before production
+- No genuinely quiet period exists: the model's PR-AUC declines from the first week after training
+- Feature rule watches only the top-10 features by importance; train-to-validation drift is in other features (ProductCD, D10, D15, M7-M9), so the rule could not fire
+- Frozen v1 rules: score PSI > 0.25; >= 3 of top-10 features with PSI > 0.25; known PR-AUC more than 15% below validation
+- Product mix shifted between train and validation (W 65% -> 80%, H 11% -> 3%, R 11% -> 4%) and stayed stable into production
+- Fraud rates for H, S, R rose from train to val (about 2-4% -> 9-13%); W stable at 2.0-2.1%
+- PSI against v1's training window is 0.5-0.7 for M1-M3, M7-M9, D11 in every production week: a step change that predates production
+- For rule v2: rebuild reference stats from each new champion's training window; do not count correlated features separately
+- 16-week PR-AUC: steep fall over 5 weeks after training, then noisy between 0.42 and 0.61, so single-week rules are unreliable
+- M columns are only populated for ProductCD = W; within W the blank share of M9 fell 70% -> 54% -> 25% (train/val/prod)
+- M7 and M9 share identical blank rates; M1-M3 and D11 appear to be populated together (to be checked)
+- PR-AUC by product: W fell 0.313 -> 0.131 (flat 2.1% fraud rate), C fell 0.854 -> 0.768, so the overall decline is within-product, not a mix effect
+- Natural drift is large in this dataset; injected drift will only be a small extra test for alert rules
+- Rule v2: group correlated features (M7-M9, M1-M3 and D11) so one underlying change is not counted several times
+- Day 6 result: never retrain 0.493 mean PR-AUC / $866,880; every 4 weeks 0.510 / $919,708; on alert 0.512 / $908,122
+- All four alerts were feature-drift alerts; the performance rule never fired because it needs two matured weeks of the current model (14-day delay), which never accumulated
+- Feature-drift rule against v1 fires every week (M and D groups above 0.25 in all 12 weeks); after a reference reset it still fired at weeks 2, 4, 7
+- All six challengers passed the promotion guard by a wide margin (+6% to +16% holdout PR-AUC); the guard was never exercised, so it is unproven here
+- Retraining did not restore validation-level PR-AUC; week 7 (about 0.41) is weak for all policies
+- Net benefit gain may include a threshold re-tuning effect (each promoted model picks its own threshold)
+- Reset check: group PSI vs the serving model's reference falls with newer references (M: 0.72 -> 0.45-0.52 -> 0.20-0.32 -> 0.04-0.13); weeks 8-11 quiet with c7 serving
+- Drift alarm condition (>= 2 groups above 0.25) was true in 7 of 12 weeks; retrains only at weeks 0, 2, 4, 7 because of the 2-week minimum gap
+- Alerts were driven by M and D together; these may be one underlying change counted twice (D11 tracks M1; other D columns not checked)
+- Retraining gain is concentrated in product W (PR-AUC weeks 4-11: 0.117 -> 0.181-0.189); C and R unchanged within 0.01; S too small to interpret
+- Results: clean: performance alert at week 11 only (0.505 vs line 0.508); amount x1.5: no drift alert, performance alert at week 11 (0.493); feed outage: score and feature drift alerts weeks 8-11 (performance at 11, 0.435); concept shift: no drift alert, performance alert at week 11 (0.163)
+- Limits found: single-group drift is ignored by design (needs 2 groups); performance rule fires on untouched data because the holdout baseline (0.635) is higher than live performance (about 0.50); PSI is uncapped (D group 14.1 when a feed goes fully blank)
+- Rules were not changed after the test; ideas listed as future work: alert on a single group with very high PSI; baseline the performance rule on early live weeks; cap PSI
+- Gain vs never retrain by serving model (rounded): c0 -$6,360 (weeks 1-2), c2 +$15 (3-4), c3 +$16,220 (4-7), c4 +$10,978 (5-7), c7 +$36,608 (8-11, both policies)
+- Weeks 8-11 carry 69% of the every-4-weeks gain and 89% of the on-alert gain; week 9 alone carries 38% and 49%
+- Retraining gave +2.4% (every 4 weeks) and +0.7% (on alert) in weeks 0-7, and about +20% in weeks 8-11
+- PR-AUC and net benefit do not always move together (week 1 on alert: higher PR-AUC, lower net benefit)
+- The promotion guard approved c0 on holdout PR-AUC (+8.5%) and net benefit, but c0 lost $6,360 in its two live weeks

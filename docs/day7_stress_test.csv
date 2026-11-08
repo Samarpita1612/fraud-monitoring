@@ -1,0 +1,17 @@
+scenario,week,score_psi,groups_over,worst_group,worst_psi,pooled_pr_auc,alert
+clean (no injection),8,0.001,0,D,0.12,,-
+clean (no injection),9,0.001,0,D,0.16,,-
+clean (no injection),10,0.014,0,email,0.07,,-
+clean (no injection),11,0.03,0,D,0.1,0.505,performance drop
+amount x1.5,8,0.015,1,amount_product,0.57,,-
+amount x1.5,9,0.016,1,amount_product,0.55,,-
+amount x1.5,10,0.053,1,amount_product,0.52,,-
+amount x1.5,11,0.065,1,amount_product,0.51,0.493,performance drop
+feed outage (M and D blank),8,0.659,2,D,14.1,,"score drift, feature drift"
+feed outage (M and D blank),9,0.682,2,D,14.1,,"score drift, feature drift"
+feed outage (M and D blank),10,0.521,2,D,14.1,,"score drift, feature drift"
+feed outage (M and D blank),11,0.539,2,D,14.1,0.435,"score drift, feature drift, performance drop"
+concept shift (half the labels random),8,0.001,0,D,0.12,,-
+concept shift (half the labels random),9,0.001,0,D,0.16,,-
+concept shift (half the labels random),10,0.014,0,email,0.07,,-
+concept shift (half the labels random),11,0.03,0,D,0.1,0.163,performance drop

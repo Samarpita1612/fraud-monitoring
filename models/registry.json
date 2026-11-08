@@ -25,52 +25,52 @@
       "fraud_usd_total": 515459.25,
       "net_benefit": 347044.33
     },
-    "status": "retired"
+    "status": "retired (end of week 0)"
   },
   {
     "version": "c0",
     "promoted_end_of_week": 0,
     "trained_on_days": [
-      9.00005787037037,
-      68.99951388888888
+      9,
+      69
     ],
-    "threshold": 0.023387425124518052,
+    "threshold": 0.0234,
     "holdout_pr_auc": 0.6755,
     "reasons": "feature drift",
-    "status": "retired"
+    "status": "retired (end of week 2)"
   },
   {
     "version": "c2",
     "promoted_end_of_week": 2,
     "trained_on_days": [
-      23.00019675925926,
-      82.99982638888889
+      23,
+      83
     ],
-    "threshold": 0.01735152494598536,
+    "threshold": 0.0174,
     "holdout_pr_auc": 0.5452,
     "reasons": "feature drift",
-    "status": "retired"
+    "status": "retired (end of week 4)"
   },
   {
     "version": "c4",
     "promoted_end_of_week": 4,
     "trained_on_days": [
-      37.00010416666667,
-      96.99986111111112
+      37,
+      97
     ],
-    "threshold": 0.01530213467127685,
+    "threshold": 0.0153,
     "holdout_pr_auc": 0.5827,
     "reasons": "feature drift",
-    "status": "retired"
+    "status": "retired (end of week 7)"
   },
   {
     "version": "c7",
     "promoted_end_of_week": 7,
     "trained_on_days": [
-      58.00012731481481,
-      117.99962962962962
+      58,
+      118
     ],
-    "threshold": 0.027991184023174243,
+    "threshold": 0.028,
     "holdout_pr_auc": 0.6351,
     "reasons": "feature drift",
     "status": "champion (simulated)"
