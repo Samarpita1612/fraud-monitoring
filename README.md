@@ -2,7 +2,7 @@
 
 A fraud model that is watched after it ships. It is trained on the past, replayed on 12 weeks of "future" transactions with realistic label delays, monitored for drift, and retrained when needed. A dashboard shows what happened.
 
-**Live dashboard:** [https://YOUR-APP-NAME.streamlit.app](https://YOUR-APP-NAME.streamlit.app)
+**Live dashboard:** [https://fraud-monitoring-mpzmmdvdzsbowe3m3jqedy.streamlit.app/](https://fraud-monitoring-mpzmmdvdzsbowe3m3jqedy.streamlit.app/)
 
 Built by [Samarpita CHowdhury] · [https://www.linkedin.com/in/samarpitachowdhury/] · [https://github.com/Samarpita1612]
 
